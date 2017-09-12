@@ -47,9 +47,10 @@ public:
         }
         
         vertex_list.reserve(num_vertex);
-        //in_edge_list.reserve(num_edge);
+
         out_edge_list.reserve(num_vertex);
         out_edge_list.resize(num_vertex, std::vector<base_t> (0) );
+
         for(int i = 0; i < num_vertex; i++)
         {
             out_edge_list[i].reserve(200);
@@ -184,7 +185,7 @@ public:
 
             if (_num_vertex < total_divisible)
             {
-                val = (base_t)(((uint64_t)_num_vertex * (uint64_t)stride ) % (uint64_t)total_divisible)   \ 
+                val = (base_t)(((uint64_t)_num_vertex * (uint64_t)stride ) % (uint64_t)total_divisible)   \
                       +  (base_t)std::floor(((uint64_t)_num_vertex * (uint64_t)stride * 1.0) / (uint64_t)total_divisible);
 
                 if (val > total_divisible)
@@ -223,7 +224,7 @@ protected:
 class timer
 {
 public:
-    static double get_usec()
+    static double get_sec()
     {
         timeval tim;
         gettimeofday(&tim, NULL);
@@ -245,9 +246,14 @@ int64_t gen_graph(//edgeset::GRAPH & kroneck_graph
              );
 
 
+void test_read_bin(  string file_name
+                   , int64_t num_vertices
+                   , int num_machines );
+
+
 unsigned get_machine_id(unsigned vertex_num
-                 , unsigned machine_num
-                 , unsigned vertex_id
-                 );
+                      , unsigned machine_num
+                      , unsigned vertex_id
+                      );
 
 #endif

@@ -250,8 +250,8 @@ int main(int argc, char* argv[]) {
                               );
 
 
-  //printf("Generated " "%" PRIu64 " edges " "%" PRIu64 " vertices \n",    \
-  //       (int64_t)num_out_e         \
+  //printf("Generated " "%" PRIu64 " edges " "%" PRIu64 " vertices \n",    
+  //       (int64_t)num_out_e         
   //     , (int64_t)(num_v_k*in_g_num_v) );
 
   std::cout<<"Generated "<<num_out_e<<" edges, "<<(int64_t)(num_v_k*in_g_num_v)<<" vertices \n";

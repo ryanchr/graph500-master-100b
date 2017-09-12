@@ -44,15 +44,29 @@ int64_t gen_graph(//edgeset::GRAPH & kroneck_graph
 	edgeset::GRAPH in_graph;
 	ofstream fout;
 
+	double t1, t2;
+
+	/*Record graph file load start time*/
+	t1 = edgeset::timer::get_sec();
+
 	in_graph.load_graph(infile_graph, num_g_edges, num_g_vertices);
+
+	/*Record graph file load end time*/
+	t2 = edgeset::timer::get_sec();
+
+	std::cout<<"Input graph file load time: "<< (t2-t1) <<" sec\n";
 
 	//
 	int64_t num_g_out_v = (int64_t)num_kroneck_vertices * (int64_t)num_g_vertices;
+
 	int64_t num_g_out_e = (int64_t)num_kroneck_edges * (int64_t)num_g_edges;
 
 	std::cout<<"Edges: "<<num_g_out_e<<" Virtex: "<<num_g_out_v<<std::endl;
 	
 	string ofile_name = "graph_v" + to_string(num_g_out_v) + "_e" + to_string(num_g_out_e);
+
+	/*Record write binary file start time*/
+	t1 = edgeset::timer::get_sec();
 
 	#if BINARY
 		fout.open(ofile_name.c_str(), ios::out | ios::binary);
@@ -150,11 +164,14 @@ int64_t gen_graph(//edgeset::GRAPH & kroneck_graph
 		if ( v_dest_k < v_src_k )
 			continue;
 
-		
+
 		for ( my_base_t v_src_g = 0; v_src_g < num_g_vertices; v_src_g++ )
 		{
 			assert(v_src_g < in_graph.out_edge_list.size());
 
+			v_src_out = v_src_k * num_g_vertices + v_src_g;
+
+			int src_m_id = get_machine_id(num_g_out_v, num_machines, v_src_out);
 			
 			for (auto v_dest_g : in_graph.out_edge_list[v_src_g])
 			{
@@ -164,7 +181,6 @@ int64_t gen_graph(//edgeset::GRAPH & kroneck_graph
 
 				//std::cout<<"v_src_g: "<<v_src_g<<", "<<"v_dest_g: "<<v_dest_g<<endl;
 
-				v_src_out = v_src_k * num_g_vertices + v_src_g;
 				v_dest_out = v_dest_k * num_g_vertices + v_dest_g;
 
 				
@@ -178,25 +194,13 @@ int64_t gen_graph(//edgeset::GRAPH & kroneck_graph
 					fout<<endl;
 				#endif
 				
-				//cout<<v_src_out;
-				//cout<<" ";
-				//cout<<v_dest_out;
-				//cout<<endl;
-				//
-				int src_m_id = get_machine_id(num_g_out_v, num_machines, v_src_out);
 				int dest_m_id = get_machine_id(num_g_out_v, num_machines, v_dest_out);
 
-				//assert(src_m_id < num_machines);
-				//assert(dest_m_id < num_machines);
-
-				//std::cout<<"src_m_id "<<src_m_id<<" dest_m_id "<<dest_m_id<<std::endl;
-				//
 				has_num_edges[src_m_id]++;
 				has_num_edges[dest_m_id]++;
 				//
 				cnt ++;
-				if (cnt % 200000000 == 0)
-					std::cout<<"loaded 200000000 edges"<<std::endl;
+				if (cnt % 200000000 == 0) std::cout<<"loaded 200000000 edges"<<std::endl;
 	    	}
 	    	
 
@@ -204,6 +208,11 @@ int64_t gen_graph(//edgeset::GRAPH & kroneck_graph
 	}
 	//#endif
 	//std::cout<<"something wrong?"<<endl;
+
+	/*Record write binary file end time */
+	t2 = edgeset::timer::get_sec();
+
+	std::cout<<"Write time for generating binary graph file: "<< (t2-t1) <<" sec\n";
 
 	//Print partition result
 	std::cout<<"== Partition result: ";
@@ -216,5 +225,49 @@ int64_t gen_graph(//edgeset::GRAPH & kroneck_graph
  
 	fout.close();
 
+	/*Test read binary file time*/
+	test_read_bin(ofile_name, num_g_out_v, num_machines);
+
 	return cnt;
 }
+
+
+/*Read binary file*/
+void test_read_bin( string file_name, int64_t num_vertices, int num_machines ){
+
+	ifstream fin;
+
+	fin.open(file_name.c_str(), ios::in | ios::binary);
+
+	my_base_t v_src, v_dest;
+
+	int cur_m_id = -1;
+
+	double t_start, t_end;
+
+	while ( fin.read(((char *)&v_src), sizeof(my_base_t))
+		&& fin.read(((char *)&v_dest), sizeof(my_base_t)) ){
+		
+		int src_m_id = get_machine_id(num_vertices, num_machines, v_src);
+
+		if (src_m_id != cur_m_id)	{
+
+			if(cur_m_id > -1){
+				
+				t_end = edgeset::timer::get_sec();	
+				std::cout<<"Load binary graph using "<<(t_end - t_start)<<" sec on machine "<<cur_m_id;
+			}
+
+			cur_m_id = src_m_id;	
+			t_start = edgeset::timer::get_sec();	
+		}
+	}
+
+	t_end = edgeset::timer::get_sec();
+	cout<<"Load binary graph using "<<(t_end - t_start)<<" sec on machine "<<cur_m_id;
+
+	fin.close();
+}
+
+
+
