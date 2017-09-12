@@ -39,7 +39,7 @@ public:
     {
         std::ifstream fin;
         
-        fin.open(ofile.c_str());
+        fin.open(ofile.c_str(), ios::in);
         if(!fin.is_open())
         {
             std::cout<<"Failed to open the file"<<std::endl;
@@ -68,12 +68,14 @@ public:
         }
 
         int64_t block_size = 1000;
-        int64_t stride_size = 100;
         int64_t num_block = std::ceil( (lines.size() * 1.0)/ block_size );
 
         base_t num_machines = 9;
-        base_t stride = num_vertex / num_machines;
+        base_t stride = std::floor(num_vertex * 1.0 / num_machines);
         base_t total_divisible = stride * num_machines;
+
+        std::cout<<"total_divisible: "<<total_divisible<<std::endl;
+
         //std::vector<int64_t> num_array(num_block, 0);
         //
         //for (int i = 0; i < num_block; i++)
@@ -146,9 +148,9 @@ public:
         
         fin.close();
 
-        std::cout<<"num of edges: "<<_num_edge;
+        std::cout<<"Input graph, num of edges: "<<_num_edge;
 
-        std::cout<<"num of vertexs: "<<_num_vertex<<std::endl;
+        std::cout<<" num of vertexs: "<<_num_vertex<<std::endl;
         
         return true;
     }
@@ -182,7 +184,14 @@ public:
 
             if (_num_vertex < total_divisible)
             {
-                val = (_num_vertex * stride ) % total_divisible + std::floor((_num_vertex * stride * 1.0) / total_divisible);
+                val = (base_t)(((uint64_t)_num_vertex * (uint64_t)stride ) % (uint64_t)total_divisible)   \ 
+                      +  (base_t)std::floor(((uint64_t)_num_vertex * (uint64_t)stride * 1.0) / (uint64_t)total_divisible);
+
+                if (val > total_divisible)
+                {
+                    cout<<"_num_vertex: "<<_num_vertex<<"stride: "<<stride<<"total_divisible: "<<total_divisible \
+                    <<"val: "<<val<<endl;
+                }
             }
             else
             {
@@ -226,7 +235,7 @@ public:
 }
 
 
-long gen_graph(//edgeset::GRAPH & kroneck_graph
+int64_t gen_graph(//edgeset::GRAPH & kroneck_graph
                std::vector<std::pair<int, int> > & k_graph
              , edgeset::base_t num_kroneck_vertices
              , edgeset::base_t num_kroneck_edges

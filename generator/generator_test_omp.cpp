@@ -59,6 +59,7 @@ void load_k_graph(std::string ifile, std::vector<std::pair<int,int> > & k_graph)
 {
     std::ifstream fin;
     fin.open(ifile.c_str());
+
     std::string line;
     int src_id, dest_id;
 
@@ -70,15 +71,18 @@ void load_k_graph(std::string ifile, std::vector<std::pair<int,int> > & k_graph)
         k_graph.push_back(std::make_pair(src_id, dest_id));
     }
 
+    fin.close();
+
     return;
 }
 
 
 int main(int argc, char* argv[]) {
   int log_numverts;
-  double start, time_taken;
-  int64_t nedges, actual_nedges;
-  packed_edge* result;
+  //double start, time_taken;
+  //int64_t nedges, actual_nedges;
+
+  //packed_edge* result;
   int ratio = 2;
   bool output_k = 0;
 
@@ -93,7 +97,7 @@ int main(int argc, char* argv[]) {
   if (argc < 7){
     std::cerr << "Format: exe num_v_k ratio_e_to_v graph_file_name graph_v_num graph_e_num output_k.  or \n";
     std::cerr << "Format: exe k_graph_file num_v_k num_e_k graph_file_name graph_v_num graph_e_num output_k.   \n";
-        return 0;
+    return 0;
   }
   else if (argc == 7){
 
@@ -120,7 +124,7 @@ int main(int argc, char* argv[]) {
   //int64_t nvertex = 1 << log_numverts;
 
   /* Start of graph generation timing */
-  start = omp_get_wtime();
+  //start = omp_get_wtime();
 
 
   size_t num_v = 0, num_e = 0;
@@ -221,7 +225,7 @@ int main(int argc, char* argv[]) {
     edgeset::GRAPH k_graph;
     num_edges = num_e;
     num_vertex = num_v;
-    k_graph.load_graph(std::string(filename), num_edges, num_vertex);
+    k_graph.load_graph(std::string(""), num_edges, num_vertex);
   }
   else if (argc == 8)
   {
@@ -236,29 +240,21 @@ int main(int argc, char* argv[]) {
   std::vector<std::pair<int, int> > k_graph;
   load_k_graph(k_graph_file, k_graph);
   
-
+  //int64_t num_out_e = 0;
   int64_t num_out_e = gen_graph(k_graph
-                          , num_v_k
-                          , num_e_k
-                          , infile_g
-                          , in_g_num_v
-                          , in_g_num_e
-                          );
+                              , num_v_k
+                              , num_e_k
+                              , infile_g
+                              , in_g_num_v
+                              , in_g_num_e
+                              );
 
-  //tmp = result;
-  
-  //for(auto x: edges)
-  //{
-  //    //v0: src, v1: dest
-  //  //tmp ++;
-  //}
 
-  printf("Generated " "%" PRIu64 " edges " "%" PRIu64 " vertices \n",    \
-         (int64_t)num_out_e         \
-       , (int64_t)(num_v_k*in_g_num_v) );
+  //printf("Generated " "%" PRIu64 " edges " "%" PRIu64 " vertices \n",    \
+  //       (int64_t)num_out_e         \
+  //     , (int64_t)(num_v_k*in_g_num_v) );
 
-  //fprintf(stderr, "%" PRIu64 " edge%s %d vertex generated in %fs (%f Medges/s)\n",  \
-  // num_deges, (num_deges == 1 ? "" : "s"), num_vertex, time_taken, 1. * num_deges / time_taken * 1.e-6);
+  std::cout<<"Generated "<<num_out_e<<" edges, "<<(int64_t)(num_v_k*in_g_num_v)<<" vertices \n";
 
   return 0;
 }
