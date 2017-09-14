@@ -236,8 +236,15 @@ int64_t gen_graph(//edgeset::GRAPH & kroneck_graph
 void test_read_bin( string file_name, int64_t num_vertices, int num_machines ){
 
 	ifstream fin;
+      
+        vector<ofstream> fout(num_machines);
 
 	fin.open(file_name.c_str(), ios::in | ios::binary);
+
+	for(int i = 0; i < num_machines; i++){
+		
+		fout[i].open((file_name + to_string(i)).c_str(), ios::out | ios::binary);
+	}
 
 	my_base_t v_src, v_dest;
 
@@ -250,12 +257,16 @@ void test_read_bin( string file_name, int64_t num_vertices, int num_machines ){
 		
 		int src_m_id = get_machine_id(num_vertices, num_machines, v_src);
 
+		fout[src_m_id].write((char *)&v_src, sizeof(my_base_t));
+		
+		fout[src_m_id].write((char *)&v_dest, sizeof(my_base_t));
+
 		if (src_m_id != cur_m_id)	{
 
 			if(cur_m_id > -1){
 				
 				t_end = edgeset::timer::get_sec();	
-				std::cout<<"Load binary graph using "<<(t_end - t_start)<<" sec on machine "<<cur_m_id;
+				std::cout<<"Load binary graph using "<<(t_end - t_start)<<" sec on machine "<<cur_m_id<<std::endl;
 			}
 
 			cur_m_id = src_m_id;	
@@ -264,9 +275,47 @@ void test_read_bin( string file_name, int64_t num_vertices, int num_machines ){
 	}
 
 	t_end = edgeset::timer::get_sec();
-	cout<<"Load binary graph using "<<(t_end - t_start)<<" sec on machine "<<cur_m_id;
+	cout<<"Load binary graph using "<<(t_end - t_start)<<" sec on machine "<<cur_m_id<<std::endl;
 
 	fin.close();
+
+	for(int i = 0; i < num_machines; i++){
+		fout[i].close();
+	}
+}
+
+
+
+void test_read_bin_all( string file_name, int64_t num_vertices, int num_machines ){
+
+     for ( int i = 0; i < num_machines; i++) {
+
+	ifstream fin;
+
+	fin.open((file_name+to_string(i)).c_str(), ios::in | ios::binary);
+
+	my_base_t v_src, v_dest;
+
+	double t_start, t_end;
+
+	t_start = edgeset::timer::get_sec();	
+	
+	while ( fin.read(((char *)&v_src), sizeof(my_base_t))
+		&& fin.read(((char *)&v_dest), sizeof(my_base_t)) ){
+		
+		int src_m_id = get_machine_id(num_vertices, num_machines, v_src);
+		
+		my_base_t a = v_src;
+
+		my_base_t b = v_dest;
+
+	}
+
+	t_end = edgeset::timer::get_sec();
+	cout<<"Load binary graph using "<<(t_end - t_start)<<" sec on machine "<<i<<std::endl;
+
+	fin.close();
+     }
 }
 
 

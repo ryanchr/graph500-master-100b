@@ -251,6 +251,9 @@ void test_read_bin(  string file_name
                    , int num_machines );
 
 
+void test_read_bin_all( string file_name, int64_t num_vertices, int num_machines );
+
+
 unsigned get_machine_id(unsigned vertex_num
                       , unsigned machine_num
                       , unsigned vertex_id
