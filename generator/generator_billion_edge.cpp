@@ -187,6 +187,9 @@ int64_t gen_graph(//edgeset::GRAPH & kroneck_graph
 				#if BINARY 
 					fout.write(reinterpret_cast<const char *> (&v_src_out), sizeof(v_src_out));
 					fout.write(reinterpret_cast<const char *> (&v_dest_out), sizeof(v_dest_out));
+
+					fout.write(reinterpret_cast<const char *> (&v_dest_out), sizeof(v_dest_out));
+					fout.write(reinterpret_cast<const char *> (&v_src_out), sizeof(v_src_out));
 				#else
 					fout<<v_src_out;
 					fout<<" ";
