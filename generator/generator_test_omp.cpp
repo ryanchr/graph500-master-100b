@@ -237,23 +237,23 @@ int main(int argc, char* argv[]) {
 
 
   //load Kronecker graph
-  std::vector<std::pair<int, int> > k_graph;
-  load_k_graph(k_graph_file, k_graph);
+  // std::vector<std::pair<int, int> > k_graph;
+  // load_k_graph(k_graph_file, k_graph);
   
   // int64_t num_out_e = 0;
-  int64_t num_out_e = gen_graph(k_graph
-                              , num_v_k
-                              , num_e_k
-                              , infile_g
-                              , in_g_num_v
-                              , in_g_num_e
-                              );
+  // int64_t num_out_e = gen_graph(k_graph
+  //                             , num_v_k
+  //                             , num_e_k
+  //                             , infile_g
+  //                             , in_g_num_v
+  //                             , in_g_num_e
+  //                             );
 
   string test_file = "graph_v65608366_e1806067135";
 
-  test_read_bin(  test_file
-                 ,65608366
-                 ,9 );
+  // test_read_bin(  test_file
+  //                ,65608366
+  //                ,9 );
 
   test_read_bin_all( test_file
                     ,65608366
@@ -263,7 +263,7 @@ int main(int argc, char* argv[]) {
   //       (int64_t)num_out_e         
   //     , (int64_t)(num_v_k*in_g_num_v) );
 
-  std::cout<<"Generated "<<num_out_e<<" edges, "<<(int64_t)(num_v_k*in_g_num_v)<<" vertices \n";
+  // std::cout<<"Generated "<<num_out_e<<" edges, "<<(int64_t)(num_v_k*in_g_num_v)<<" vertices \n";
 
   return 0;
 }
