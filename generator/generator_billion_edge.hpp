@@ -260,11 +260,11 @@ unsigned get_machine_id(unsigned vertex_num
 
 int64_t gen_graph(//edgeset::GRAPH & kroneck_graph
                std::vector<std::pair<int, int> > & k_graph
-             , my_base_t num_kroneck_vertices
-             , my_base_t num_kroneck_edges
+             , edgeset::base_t num_kroneck_vertices
+             , edgeset::base_t num_kroneck_edges
              , string infile_graph
-             , my_base_t num_g_vertices
-             , my_base_t num_g_edges
+             , edgeset::base_t num_g_vertices
+             , edgeset::base_t num_g_edges
              , int num_edge_partitions
              );
 
